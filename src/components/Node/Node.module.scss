@@ -1,0 +1,334 @@
+$VID_WIDTH: 320px;
+$VID_HEIGHT: 240px;
+$VID_CIRCLE_DIAMETER: 80px;
+$CUBIC_BEZIER: cubic-bezier(.5, .35, .15, 1.4);
+
+$CIRCLE_DIAMETER: 50px;
+$GAP: 8px;
+$reverse: true;
+
+@mixin flexCenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin animation($animationName, $startX, $startY, $reverse: false, $endX: '0px', $endY: '0px') {
+    @keyframes #{$animationName} {
+
+        0% {
+            opacity: 0;
+            // visibility: hidden;
+            scale: .5;
+
+            @if $reverse {
+                opacity: 1;
+                // visibility: visible;
+                scale: 1;
+            }
+            translate: #{$startX} #{$startY};
+        }
+
+
+        100% {
+            opacity: 1;
+            // visibility: visible;
+            scale: 1;
+
+            @if $reverse {
+                opacity: 0;
+                // visibility: hidden;
+                scale: .5;
+            }
+
+            translate: #{$endX} #{$endY};
+        }
+
+    }
+}
+
+@mixin spin ($animationName, $reverse: false){
+    @keyframes #{$animationName} {
+        0% {
+            rotate: -180deg;
+            @if $reverse {
+                rotate: 0deg;
+            }
+        }
+
+        // 50% {
+        //     rotate: 30deg;
+        // }
+
+        100% {
+            rotate: 0deg;
+            @if $reverse {
+                rotate: -180deg;
+            }
+        }
+    }
+}
+@mixin extend($animationName, $reverse: false) {
+    @keyframes #{$animationName} {
+        0% {
+            scale: 0% 100%;
+            @if $reverse {
+                scale: 100% 100%;
+            }
+
+        }
+        100%{
+            scale: 100% 100%;
+            @if $reverse {
+                scale: 0% 100%;
+                translate: -25% 0%;
+            }
+        }
+    }
+}
+
+.mediaInCircle {
+    width: $CIRCLE_DIAMETER;
+    height: $CIRCLE_DIAMETER;
+    background-color: #00ff0d5a;
+    border-radius: 50%;
+}
+
+// @layer back-layer 
+
+
+.backLayer {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-direction: column;
+    gap: $CIRCLE_DIAMETER + $GAP;
+    width: fit-content;
+
+    // width: fit-content;
+    z-index: 0;
+
+    background: #2b2c30;
+    border-radius: 20px;
+    transition: 450ms $CUBIC_BEZIER;
+
+    padding-left: $GAP;
+    padding-bottom: $GAP;
+    left: 0;
+    bottom: 0;
+}
+.backLayerOut {
+    @extend .backLayer;
+    width: $VID_CIRCLE_DIAMETER + $GAP;
+    height: $VID_CIRCLE_DIAMETER + $GAP;
+}
+.backLayerIn {
+    @extend .backLayer;
+    width: $VID_WIDTH + $GAP;
+    height: $VID_HEIGHT + $CIRCLE_DIAMETER+ 2*$GAP;
+}
+
+
+// @layer video-preview 
+
+.videoPreview {
+    @extend .mediaInCircle;
+    width: $VID_CIRCLE_DIAMETER;
+    height: $VID_CIRCLE_DIAMETER;
+    position: absolute;
+
+    background-image: url("https://i0.wp.com/www.printmag.com/wp-content/uploads/2021/02/4cbe8d_f1ed2800a49649848102c68fc5a66e53mv2.gif?fit=476%2C280&amp;ssl=1");
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    z-index: 5;
+}
+
+.videoPreviewOut {
+    @extend .videoPreview;
+    background-color: #0400ff73;
+    background-position: -13px 0px; //temporary
+    transition: all .45s $CUBIC_BEZIER;
+}
+
+.videoPreviewIn {
+    @extend .videoPreview;
+    background-color: #319ee7;
+    transition: all .45s $CUBIC_BEZIER;
+
+    width: $VID_WIDTH;
+    height: $VID_HEIGHT;
+    border-radius: 30px;
+    background-position: -13px 0px; //temporary
+}
+
+
+// @layer buttons 
+
+.outsideButtons {
+    position: relative;
+
+    @include flexCenter();
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.messageButton {
+    @extend .mediaInCircle;
+    position: absolute;
+    background-color: white;
+    border: none;
+    translate: $VID_WIDTH + 2*$GAP 0 - $GAP - 2*$CIRCLE_DIAMETER;
+    z-index: 1;
+}
+
+.messageButtonIn {
+    @extend .messageButton;
+    animation: messageIn 450ms $CUBIC_BEZIER, spinIn 650ms $CUBIC_BEZIER;
+    // animation-delay: 2000ms;
+    animation-fill-mode: both;
+
+
+}
+
+.messageButtonOut {
+    @extend .messageButton;
+    animation: messageOut 450ms $CUBIC_BEZIER, spinOut 650ms $CUBIC_BEZIER;
+    animation-fill-mode: both;
+    // animation-delay: 2000ms;
+}
+
+.danceButton {
+    @extend .mediaInCircle;
+    position: absolute;
+    background-color: white;
+    border: none;
+    translate: $VID_WIDTH + 2*$GAP 0 - $CIRCLE_DIAMETER;
+}
+
+.danceButtonIn {
+    @extend .danceButton;
+    animation: danceIn 450ms $CUBIC_BEZIER, spinIn 650ms $CUBIC_BEZIER;
+    // animation-delay: 2000ms;
+    animation-fill-mode: both;
+
+}
+
+.danceButtonOut {
+    @extend .danceButton;
+    animation: danceOut 450ms $CUBIC_BEZIER, spinOut 650ms $CUBIC_BEZIER;
+    animation-fill-mode: both;
+    // animation-delay: 2000ms;
+}
+
+
+
+// @layer author-line 
+
+.authorLine {
+    // margin-bottom: $GAP + $CIRCLE_DIAMETER;
+    position: absolute;
+
+    display: flex;
+    justify-content: flex-start;
+    // align-items: center;
+    // gap: $GAP + $GAP + $CIRCLE_DIAMETER;
+
+    // background-color: #1030b3;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    height: 60px;
+    width: 320px + 10px;
+    translate: 0px 0-$VID_HEIGHT;
+}
+
+.authorLineIn {
+    @extend .authorLine;
+    animation: authorLineIn 450ms $CUBIC_BEZIER;
+    z-index: 1;
+}
+
+.authorLineOut {
+    @extend .authorLine;
+    animation: authorLineOut 450ms $CUBIC_BEZIER;
+    animation-fill-mode: forwards;
+    z-index: 1;
+}
+
+
+.authorName {
+    position: absolute;
+    overflow: hidden;
+    margin-top: 0.25em;
+    white-space: nowrap;
+    color: white;
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 2em;
+    translate: $CIRCLE_DIAMETER + $GAP 0px;
+}
+.authorNameIn::before{
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: translateX(0);
+    background: #2b2c30;
+    animation: reveal .5s ease-in forwards;
+}
+    
+    .authorNameIn{
+    @extend .authorName;
+}
+.authorNameOut{
+    @extend .authorName;
+    animation: extendOut 450ms $CUBIC_BEZIER;
+    
+}
+
+.avatarCircle {
+    @extend .mediaInCircle;
+    @include flexCenter();
+
+    // position: absolute;
+    background-image: url("../../../img/avatar.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.avatarCircleIn{
+    @extend .avatarCircle;
+
+}
+.avatarCircleOut{
+    @extend .avatarCircle;
+
+}
+
+
+
+
+
+@include animation(messageIn, '0px', 0-$CIRCLE_DIAMETER, false, $VID_WIDTH + 2*$GAP, 0 - $GAP - 2*$CIRCLE_DIAMETER);
+@include animation(messageOut, $VID_WIDTH + 2*$GAP, 0 - $GAP - 2*$CIRCLE_DIAMETER, $reverse, '0px', 0-$CIRCLE_DIAMETER);
+@include animation(danceIn, '0px', 0-$CIRCLE_DIAMETER, false, $VID_WIDTH + 2*$GAP, 0 - $CIRCLE_DIAMETER);
+@include animation(danceOut, $VID_WIDTH + 2*$GAP, 0 - $CIRCLE_DIAMETER, $reverse, '0px', 0-$CIRCLE_DIAMETER);
+
+@include animation(authorLineIn, 0-2*$GAP - $CIRCLE_DIAMETER, '0px', false, '0px', 0-$VID_HEIGHT);
+@include animation(authorLineOut, '0px', 0-$VID_HEIGHT, $reverse, 0-2*$GAP - $CIRCLE_DIAMETER, '0px');
+@include animation(authorNameIn, 0-2*$GAP - $CIRCLE_DIAMETER, '0px', false, '0px', 0-$VID_HEIGHT);
+@include animation(authorNameOut, '0px', 0-$VID_HEIGHT, $reverse, 0-2*$GAP - $CIRCLE_DIAMETER, '0px');
+
+@include spin(spinIn);
+@include spin(spinOut, $reverse);
+@include extend(extend);
+@include extend(extendOut, $reverse);
+
+@keyframes reveal{
+    0% {transform: translateX(0)}
+    100% {transform: translateX(200%)}
+}
+@keyframes revealOut{
+    0% {transform: translateX(200%)}
+    100% {transform: translateX(0%)}
+}
