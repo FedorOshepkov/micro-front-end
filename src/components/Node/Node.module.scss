@@ -12,7 +12,6 @@ $reverse: true;
     align-items: center;
     justify-content: center;
 }
-
 @mixin animation($animationName, $startX, $startY, $reverse: false, $endX: '0px', $endY: '0px') {
     @keyframes #{$animationName} {
 
@@ -46,7 +45,6 @@ $reverse: true;
 
     }
 }
-
 @mixin spin ($animationName, $reverse: false){
     @keyframes #{$animationName} {
         0% {
@@ -98,6 +96,15 @@ $reverse: true;
 
 
 .backLayer {
+    // from button
+	background: none;
+	color: inherit;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+
     position: relative;
     display: flex;
     align-items: flex-start;
@@ -112,9 +119,8 @@ $reverse: true;
     background: #2b2c30;
     border-radius: 20px;
     transition: 450ms $CUBIC_BEZIER;
-
-    padding-left: $GAP;
-    padding-bottom: $GAP;
+    appearance: none;
+    padding: 0 0 $GAP $GAP;
     left: 0;
     bottom: 0;
 }
