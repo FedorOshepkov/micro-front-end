@@ -8,7 +8,7 @@ import danceSVG from '../../icons/activity.svg';
 
 function Node() {
   // let nodeState = useState("compact", Expand());
-
+  let holdCount = 0;
   const [nodeState, setNodeState] = useState(false);
   const [isAnimated, setIsAnimated] = useState(false);
   function changeNodeState() {
@@ -23,24 +23,39 @@ function Node() {
     return animated ? className.concat('In') : className.concat('Out');
   }
 
-  function onNodeClick(e) {
-    e.stopPropagation();
-    e.nativeEvent.stopImmediatePropagation();
+  function onNodeClick() {
     setIsAnimated(!isAnimated);
     if (!nodeState) changeNodeState();
   }
-  
-  //Better set timer, and if user holds mouseDown less then 400ms 
-  // then count it as click otherwise just drag over
-  function stopNodePropagation(e) {
+
+  function startCount(e) {
+    e.preventDefault();
+
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
+    holdCount += 1;
   }
+
+  function stopCount(e) {
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+    if (holdCount < 10) onNodeClick();
+    holdCount = 0;
+  }
+
+  // Better set timer, and if user holds mouseDown less then 400ms
+  // then count it as click otherwise just drag over
+  // function stopNodePropagation(e) {
+  //   e.stopPropagation();
+  //   e.nativeEvent.stopImmediatePropagation();
+  // }
   return (
     <div
       className={classes[animatedClass('backLayer')]}
-      onClick={onNodeClick}
-      onMouseDown={stopNodePropagation}
+      // onClick={onNodeClick}
+      onMouseDown={startCount}
+      onMouseUp={stopCount}
+      draggable="false"
     >
       {nodeState && (
         <div className={classes[animatedClass('authorLine')]}>
