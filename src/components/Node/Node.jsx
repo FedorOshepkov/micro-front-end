@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable */
+
 import React, { useState } from 'react';
 import classes from './Node.module.scss';
 
@@ -23,24 +25,37 @@ function Node() {
     return animated ? className.concat('In') : className.concat('Out');
   }
 
-  function onNodeClick() {
+  function onNodeClick(e) {
+    e.preventDefault();
+
+    e.stopPropagation();
+    e.nativeEvent.stopImmediatePropagation();
+
     setIsAnimated(!isAnimated);
     if (!nodeState) changeNodeState();
   }
 
   function startCount(e) {
+    console.log(isDown);
+    if (!isDown) return;
     e.preventDefault();
-
-    e.stopPropagation();
-    e.nativeEvent.stopImmediatePropagation();
+    // e.stopPropagation();
+    // e.nativeEvent.stopImmediatePropagation();
     holdCount += 1;
+    console.log('holdCounting:', holdCount);
   }
 
+  let isDown = false;
+  function setIsDown(e) {
+    isDown = true;
+  }
   function stopCount(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
+    console.log('holdCount:', holdCount);
     if (holdCount < 10) onNodeClick();
     holdCount = 0;
+    isDown = false;
   }
 
   // Better set timer, and if user holds mouseDown less then 400ms
@@ -52,10 +67,11 @@ function Node() {
   return (
     <div
       className={classes[animatedClass('backLayer')]}
-      // onClick={onNodeClick}
-      onMouseDown={startCount}
-      onMouseUp={stopCount}
-      draggable="false"
+      draggable
+      onClick={onNodeClick}
+    // onMouseDown={setIsDown}
+    // onMouseOver={startCount}
+    // onMouseUp={stopCount}
     >
       {nodeState && (
         <div className={classes[animatedClass('authorLine')]}>

@@ -10,26 +10,28 @@ function Canvas() {
 
   let canvas = null;
   let canvasRef = null;
+  let content = null;
+
+  let divStyle = null;
 
   useEffect(() => {
     console.log("CANVAS MOUNTED!!");
     canvasRef = canvasREF.current;
     canvas = document.getElementById('canvas');
-    // console.log(canvasRef, canvas);
+    content = document.getElementById('content');
+
     window.addEventListener('mouseup', onCanvasDragEnd);
     window.addEventListener('mousemove', onCanvasDrag);
-    // window.addEventListener('onscroll', () => {window.scrollTo(canvas.offsetLeft, canvas.offsetTop)} );
-    // window.onscroll = function() {
-    //   window.scrollTo(canvas.offsetLeft, canvas.offsetTop)
-    canvas.addEventListener('wheel', onCanvasScroll, {passive: false});
-    
+    // window.addEventListener('onscroll', () => { window.scrollTo(canvas.offsetLeft, canvas.offsetTop) });
+
+    content.addEventListener('wheel', onCanvasScroll, { passive: false });
   }, []);
 
   let canvasREF = useRef(null);
   const scroll = {
     isDown: false,
-    startX: 0,
-    startY: 0,
+    anchorX: 0,
+    anchorY: 0,
     X: 1,
     Y: 1,
     prevX: 0,
@@ -40,12 +42,15 @@ function Canvas() {
     Top: 0,
     velocityX: 0,
     velocityY: 0,
-    friction: 0.96,
+    friction: 0.99,
     inertiaDistX: 0,
     inertiaDistY: 0,
+    totalTranslateX: 0,
+    totalTranslateY: 0,
   };
 
   let zoom = 1;
+  let sizeZoom = 1;
   const ZOOM_SPEED = 0.01;
 
   let beginX = 0;
@@ -59,22 +64,33 @@ function Canvas() {
     scroll.isDown = true;
     // e.preventDefault();
 
-    console.log("Inertia dist X:", scroll.inertiaDistX, "Y:", scroll.inertiaDistY);
+    // scroll.anchorX = e.pageX - content.offsetLeft;
+    // scroll.anchorX = e.pageY - content.offsetTop;
 
-    scroll.startX = e.pageX - canvas.offsetLeft;
-    scroll.startY = e.pageY - canvas.offsetTop;
+    // scroll.anchorX = e.pageX - scroll.totalTranslateX;
+    scroll.anchorX = e.pageX;
+    // scroll.anchorY = e.pageY - scroll.totalTranslateY;
+    scroll.anchorY = e.pageY;
 
-    scroll.prevX = scroll.startX;
-    scroll.prevY = scroll.startY;
+    scroll.prevX = scroll.anchorX;
+    scroll.prevY = scroll.anchorX;
 
-    scroll.Left = canvas.scrollLeft;
-    scroll.Top = canvas.scrollTop;
+    scroll.totalTranslateX = scroll.Left;
+    scroll.totalTranslateY = scroll.Top;
+
+    // scroll.Left = content.scrollLeft;  //important
+    // scroll.Top = content.scrollTop;
 
     scroll.inertiaDistX = 0;
     scroll.inertiaDistY = 0;
 
-    beginX = canvas.scrollLeft;
     console.log("beginX:", beginX);
+  }
+
+  function checkBoarders () {
+    
+
+    
   }
 
   function onCanvasDrag(e) {
@@ -82,91 +98,115 @@ function Canvas() {
     // console.log("is dragging!");
     e.preventDefault();
 
-    scroll.X = e.pageX - canvas.offsetLeft;
-    scroll.Y = e.pageY - canvas.offsetTop;
-    scroll.walkX = scroll.X - scroll.startX;
-    scroll.walkY = scroll.Y - scroll.startY;
+    // scroll.X = e.pageX - content.offsetLeft;
+    scroll.X = e.pageX;
+    scroll.Y = e.pageY;
+    scroll.walkX = scroll.X - scroll.anchorX;
+    scroll.walkY = scroll.Y - scroll.anchorY;
 
-    canvas.scrollLeft = scroll.Left - scroll.walkX;
-    canvas.scrollTop = scroll.Top - scroll.walkY;
+    // console.log(scroll.X);
 
-    // questionable
-    // scroll.startX = e.pageX - canvas.offsetLeft;
-    // scroll.startY = e.pageY - canvas.offsetTop;
+    // canvas.scrollLeft = scroll.Left - scroll.walkX;
+    // canvas.scrollTop = scroll.Top - scroll.walkY;
+    scroll.Left = scroll.totalTranslateX + scroll.walkX;
+    scroll.Top = scroll.totalTranslateY + scroll.walkY;
 
-    scroll.velocityX = scroll.X - scroll.prevX;
-    scroll.velocityY = scroll.Y - scroll.prevY;
+    content.style.transform = ''
+    + `translate(${(scroll.Left)}px, ${(scroll.Top)}px) scale(${(zoom)})`;
+    + `translate(${(scroll.Left)}px) scale(${(zoom)})`;
+
+
+    scroll.velocityX = (scroll.X - scroll.prevX);
+    scroll.velocityY = (scroll.Y - scroll.prevY);
 
     scroll.prevX = scroll.X;
     scroll.prevY = scroll.Y;
-
-    // console.log(scroll.velocityX);
-    // var img = document.createElement("img");
-    // img.src = "../../../img/avatar.jpg";
-    // e.dataTransfer.setDragImage(null);
-    midX = canvas.scrollLeft;
-    console.log("midX:", scroll.X);
   }
 
   function onCanvasDragEnd(e) {
     console.log('drag end');
     scroll.isDown = false;
 
-    // scroll.Left = canvas.scrollLeft;
-    // scroll.Top = canvas.scrollTop;
+    scroll.totalTranslateX = scroll.Left;
+    scroll.totalTranslateY = scroll.Top;
 
-    endX = canvas.scrollLeft;
-    console.log("endX:", endX);
     inertia();
+    console.log("flying...");
+
   }
 
   function inertia() {
     if (!scroll.isDown &&
       (Math.abs(scroll.velocityX) >= 1 || Math.abs(scroll.velocityY) >= 1)) {
-      console.log("flying...");
 
       canvas.scrollLeft -= scroll.velocityX;
       canvas.scrollTop -= scroll.velocityY;
 
+      scroll.Left += scroll.velocityX;
+      scroll.Top += scroll.velocityY;
+
+      content.style.transform = ''
+      + `translate(${(scroll.Left)}px, ${(scroll.Top)}px) scale(${(zoom)})`;
+        // + `translate(${(scroll.Left)}px) scale(${(zoom)})`;
+
       scroll.inertiaDistX += scroll.velocityX;
       scroll.inertiaDistY += scroll.velocityY;
+
+
 
       scroll.velocityX = Math.round(100 * scroll.velocityX * scroll.friction) / 100;
       scroll.velocityY = Math.round(100 * scroll.velocityY * scroll.friction) / 100;
       requestAnimationFrame(inertia);
     }
   }
+  let zoomDirection = 0;
 
   function onCanvasScroll(e) {
     e.stopPropagation();
     e.preventDefault();
-    // if (e.deltaY > 0) {
-    //   canvas.firstChild.style.transform = `scale(${(zoom += ZOOM_SPEED)})`;
-    // } else {
-    //   canvas.firstChild.style.transform = `scale(${(zoom -= ZOOM_SPEED)})`;
-    // }
-    // console.log()
+    e.deltaY > 0 ? zoomDirection = 1 : zoomDirection = - 1;
+
+    scroll.Left += 0.5 * zoomDirection * ZOOM_SPEED * content.offsetWidth;
+    scroll.Top += 0.5 * zoomDirection * ZOOM_SPEED * content.offsetHeight;
+    zoom += zoomDirection * ZOOM_SPEED;
+
+    content.style.transform = ''
+      + `translate(${scroll.Left}px, ${scroll.Top}px) scale(${(zoom)})`;
+
     return false;
   }
 
+  function setDefault() {
+    scroll.Left = 0;
+    scroll.Top = 0;
+    content.style.transform = ''
+      + `translate(${(scroll.Left)}px, ${(scroll.Top)}px) scale(${(zoom)})`;
+  }
+
   return (
-    <div
-      ref={canvasREF}
-      id="canvas"
-      draggable="true"
-      className={classes.canvas}
-      onMouseDown={onCanvasDragStart}
-      // onWheel={onCanvasScroll}
-    >
+    <>
       <div
-        className={classes.content}
+        ref={canvasREF}
+        id="canvas"
+        draggable="true"
+        className={classes.canvas}
+        onWheel={onCanvasScroll}
       >
-        <div className={classes.nodeWrapper}
+        <div
+          id="content"
+          className={classes.content}
+          onMouseDown={onCanvasDragStart}
+
         >
-          <Node />
+          <div className={classes.nodeWrapper}>
+            <Node />
+          </div>
         </div>
       </div>
-    </div>
+      <button
+        onClick={setDefault}> Default </button>
+    </>
+
   );
 }
 

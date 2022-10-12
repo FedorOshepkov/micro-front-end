@@ -1,16 +1,19 @@
 .canvas{
     cursor: grab;
     overflow: auto;
-    height: 100vh;
-    width: 100wh;
+    height: 90vh;
+    width: 90vw;
     position: relative;
     background-color: #202124;
     
+    margin: auto;
+    margin-top: 5%;
+
     user-select: none;
 }
 .content{
-    height: 4800px;
-    width: 4800px;
+    height: 480px;
+    width: 480px;
     background-color: #26439a;
     position: relative;
     margin: 50px;
@@ -22,7 +25,7 @@
     position: absolute; 
     justify-content: flex-start;
     align-items: flex-end;
-    left: 1050px;
-    bottom: 90%;
+    left: 0px;
+    bottom: 0px;
     user-select: none;
 }
