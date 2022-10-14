@@ -1,28 +1,29 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-console */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable */
-import React, { useEffect, useRef } from 'react';
-import Node from '../Node/Node';
-import classes from './Canvas.module.scss';
+// /* eslint-disable jsx-a11y/no-static-element-interactions */
+// /* eslint-disable no-console */
+// /* eslint-disable jsx-a11y/click-events-have-key-events */
+// /* eslint-disable */
+import React, { useEffect, useRef } from "react";
+import Node from "../Node/Node";
+import classes from "./Canvas.module.scss";
 
 function Canvas() {
-
   let canvas = null;
   let canvasRef = null;
+
+
+  
 
   useEffect(() => {
     console.log("CANVAS MOUNTED!!");
     canvasRef = canvasREF.current;
-    canvas = document.getElementById('canvas');
+    canvas = document.getElementById("canvas");
     // console.log(canvasRef, canvas);
-    window.addEventListener('mouseup', onCanvasDragEnd);
-    window.addEventListener('mousemove', onCanvasDrag);
+    window.addEventListener("mouseup", onCanvasDragEnd);
+    window.addEventListener("mousemove", onCanvasDrag);
     // window.addEventListener('onscroll', () => {window.scrollTo(canvas.offsetLeft, canvas.offsetTop)} );
     // window.onscroll = function() {
     //   window.scrollTo(canvas.offsetLeft, canvas.offsetTop)
-    canvas.addEventListener('wheel', onCanvasScroll, {passive: false});
-    
+    canvas.addEventListener("wheel", onCanvasScroll, { passive: false });
   }, []);
 
   let canvasREF = useRef(null);
@@ -52,14 +53,18 @@ function Canvas() {
   let midX = 0;
   let endX = 0;
 
-
   function onCanvasDragStart(e) {
     // console.log('Canvas is drugging.....');
 
     scroll.isDown = true;
     // e.preventDefault();
 
-    console.log("Inertia dist X:", scroll.inertiaDistX, "Y:", scroll.inertiaDistY);
+    console.log(
+      "Inertia dist X:",
+      scroll.inertiaDistX,
+      "Y:",
+      scroll.inertiaDistY
+    );
 
     scroll.startX = e.pageX - canvas.offsetLeft;
     scroll.startY = e.pageY - canvas.offsetTop;
@@ -78,7 +83,9 @@ function Canvas() {
   }
 
   function onCanvasDrag(e) {
-    if (!scroll.isDown) { return; }
+    if (!scroll.isDown) {
+      return;
+    }
     // console.log("is dragging!");
     e.preventDefault();
 
@@ -109,7 +116,7 @@ function Canvas() {
   }
 
   function onCanvasDragEnd(e) {
-    console.log('drag end');
+    console.log("drag end");
     scroll.isDown = false;
 
     // scroll.Left = canvas.scrollLeft;
@@ -121,8 +128,10 @@ function Canvas() {
   }
 
   function inertia() {
-    if (!scroll.isDown &&
-      (Math.abs(scroll.velocityX) >= 1 || Math.abs(scroll.velocityY) >= 1)) {
+    if (
+      !scroll.isDown &&
+      (Math.abs(scroll.velocityX) >= 1 || Math.abs(scroll.velocityY) >= 1)
+    ) {
       console.log("flying...");
 
       canvas.scrollLeft -= scroll.velocityX;
@@ -131,8 +140,10 @@ function Canvas() {
       scroll.inertiaDistX += scroll.velocityX;
       scroll.inertiaDistY += scroll.velocityY;
 
-      scroll.velocityX = Math.round(100 * scroll.velocityX * scroll.friction) / 100;
-      scroll.velocityY = Math.round(100 * scroll.velocityY * scroll.friction) / 100;
+      scroll.velocityX =
+        Math.round(100 * scroll.velocityX * scroll.friction) / 100;
+      scroll.velocityY =
+        Math.round(100 * scroll.velocityY * scroll.friction) / 100;
       requestAnimationFrame(inertia);
     }
   }
@@ -158,11 +169,8 @@ function Canvas() {
       onMouseDown={onCanvasDragStart}
       // onWheel={onCanvasScroll}
     >
-      <div
-        className={classes.content}
-      >
-        <div className={classes.nodeWrapper}
-        >
+      <div className={classes.content}>
+        <div className={classes.nodeWrapper}>
           <Node />
         </div>
       </div>
@@ -176,4 +184,3 @@ export default Canvas;
 // stopPropagation for Node
 // Ref doesn't work
 // onDrag  doesn't work
-
